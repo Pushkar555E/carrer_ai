@@ -321,6 +321,24 @@ input[type="range"]::-webkit-slider-thumb {
   box-shadow: 0 0 10px rgba(124, 58, 237, 0.5);
 }
 
+/* Native select dropdown fix - browser uses OS default white bg for option list */
+select {
+  background-color: #141420;
+  color: #ffffff;
+  color-scheme: dark;
+}
+
+select option {
+  background-color: #1a1a2e;
+  color: #ffffff;
+}
+
+select option:hover,
+select option:checked {
+  background-color: #4f46e5;
+  color: #ffffff;
+}
+
 /* Tooltip */
 .tooltip {
   position: relative;
