@@ -28,7 +28,7 @@ export type TechStack =
 
 export type Timeline = "1month" | "3months" | "6months" | "1year" | "2years";
 
-export type HoursPerDay = 1 | 2 | 4 | 6 | 8;
+export type HoursPerDay = number;
 
 export interface UserProfile {
   // Core Info

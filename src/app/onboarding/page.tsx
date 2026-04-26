@@ -2,10 +2,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, ArrowRight, ArrowLeft, ChevronDown } from "lucide-react";
+import { Sparkles, ArrowRight, ArrowLeft } from "lucide-react";
 import { useCareerStore } from "@/store/careerStore";
 import { generateCareerAnalysis } from "@/lib/ai";
-import type { UserProfile, SkillLevel, GoalType, TechStack, Timeline, HoursPerDay } from "@/types";
+import type { UserProfile, SkillLevel, GoalType, TechStack, Timeline } from "@/types";
 
 const SKILLS_LIST = [
   "HTML","CSS","JavaScript","TypeScript","React","Next.js","Vue","Angular","Svelte",
@@ -37,6 +37,10 @@ export default function OnboardingPage() {
   const [error, setError] = useState("");
   const [genStep, setGenStep] = useState("");
   const [genProgress, setGenProgress] = useState(0);
+  const [customHours, setCustomHours] = useState("");
+  const [isCustomHours, setIsCustomHours] = useState(false);
+  const [isCustomTimeline, setIsCustomTimeline] = useState(false);
+  const [customTimelineVal, setCustomTimelineVal] = useState("");
 
   const [profile, setProfile] = useState<UserProfile>({
     name: "",
@@ -244,22 +248,110 @@ export default function OnboardingPage() {
                     ))}
                   </select>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-4">
+                  {/* ── Available time/day ── */}
                   <div>
-                    <label className="block text-sm font-medium text-white/70 mb-2">Available time/day</label>
-                    <select value={profile.hoursPerDay} onChange={(e) => patch("hoursPerDay", Number(e.target.value) as HoursPerDay)} className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-violet-500/50 transition-all">
-                      {[[1,"1 hour"],[2,"2 hours"],[4,"4 hours"],[6,"6 hours"],[8,"8 hours"]].map(([v,l]) => (
-                        <option key={v} value={v}>{l}</option>
+                    <label className="block text-sm font-medium text-white/70 mb-3">Available time/day</label>
+                    <div className="flex flex-wrap gap-2">
+                      {[1, 2, 4, 6, 8].map((h) => (
+                        <button
+                          key={h}
+                          type="button"
+                          onClick={() => { setIsCustomHours(false); patch("hoursPerDay", h); }}
+                          className={`px-4 py-2 rounded-xl text-sm font-medium border transition-all ${
+                            !isCustomHours && profile.hoursPerDay === h
+                              ? "border-violet-500/60 bg-violet-500/15 text-violet-300"
+                              : "border-white/8 bg-white/3 text-white/50 hover:border-white/20 hover:text-white/80"
+                          }`}
+                        >
+                          {h}h
+                        </button>
                       ))}
-                    </select>
+                      <button
+                        type="button"
+                        onClick={() => { setIsCustomHours(true); setCustomHours(""); }}
+                        className={`px-4 py-2 rounded-xl text-sm font-medium border transition-all ${
+                          isCustomHours
+                            ? "border-cyan-500/60 bg-cyan-500/15 text-cyan-300"
+                            : "border-white/8 bg-white/3 text-white/50 hover:border-white/20 hover:text-white/80"
+                        }`}
+                      >
+                        Custom
+                      </button>
+                    </div>
+                    <AnimatePresence>
+                      {isCustomHours && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          transition={{ duration: 0.2 }}
+                          className="mt-2 overflow-hidden"
+                        >
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="number"
+                              min="0.5"
+                              max="24"
+                              step="0.5"
+                              value={customHours}
+                              placeholder="e.g. 3"
+                              onChange={(e) => {
+                                setCustomHours(e.target.value);
+                                const n = parseFloat(e.target.value);
+                                if (!isNaN(n) && n > 0) patch("hoursPerDay", n);
+                              }}
+                              className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-cyan-500/40 text-white placeholder:text-white/30 focus:outline-none focus:border-cyan-500/70 transition-all"
+                            />
+                            <span className="text-white/40 text-sm whitespace-nowrap">hrs/day</span>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
+
+                  {/* ── Target timeline ── */}
                   <div>
                     <label className="block text-sm font-medium text-white/70 mb-2">Target timeline</label>
-                    <select value={profile.timeline} onChange={(e) => patch("timeline", e.target.value as Timeline)} className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-violet-500/50 transition-all">
-                      {[["1month","1 month"],["3months","3 months"],["6months","6 months"],["1year","1 year"],["2years","2 years"]].map(([v,l]) => (
+                    <select
+                      value={isCustomTimeline ? "custom" : profile.timeline}
+                      onChange={(e) => {
+                        if (e.target.value === "custom") {
+                          setIsCustomTimeline(true);
+                        } else {
+                          setIsCustomTimeline(false);
+                          patch("timeline", e.target.value);
+                        }
+                      }}
+                      className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-violet-500/50 transition-all"
+                    >
+                      {[["1month","1 month"],["3months","3 months"],["6months","6 months"],["1year","1 year"],["2years","2 years"],["custom","⌨ Custom..."]].map(([v,l]) => (
                         <option key={v} value={v}>{l}</option>
                       ))}
                     </select>
+                    <AnimatePresence>
+                      {isCustomTimeline && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          transition={{ duration: 0.2 }}
+                          className="mt-2 overflow-hidden"
+                        >
+                          <input
+                            type="text"
+                            value={customTimelineVal}
+                            placeholder="e.g. 8 months, 18 months..."
+                            onChange={(e) => {
+                              setCustomTimelineVal(e.target.value);
+                              // Store as a custom string; AI reads it as plain text
+                              patch("timeline", e.target.value);
+                            }}
+                            className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-violet-500/40 text-white placeholder:text-white/30 focus:outline-none focus:border-violet-500/70 transition-all"
+                          />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
                 </div>
               </div>
