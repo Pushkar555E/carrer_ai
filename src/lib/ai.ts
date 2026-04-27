@@ -237,56 +237,64 @@ export async function generateCareerAnalysis(
 
   onProgress?.(25, "Generating career roadmap...");
 
-  // ── Multi-model waterfall ─────────────────────────────────
-  // Tries each free model in order. Skips to next on 429/503.
-  // Each model gets up to 2 retries before moving on.
+  // ── Multi-model waterfall ─────────────────────────────────────────────
+  // Strategy:
+  //   429 (quota exhausted)  → instantly skip to next model, NO delay.
+  //                            Waiting doesn't help — quota resets daily.
+  //   503 (overloaded)       → 1 retry with 1.5s delay, then skip.
+  //   Other errors           → skip immediately.
+  // Worst-case wall time: ~7.5s across all 5 models (safe for Vercel 10s limit).
   let response: Response | null = null;
   let lastError = "";
-  const PER_MODEL_RETRIES = 2;
 
   for (let mi = 0; mi < MODEL_WATERFALL.length; mi++) {
     const model = MODEL_WATERFALL[mi];
     const endpoint = `${GEMINI_BASE}/${model}:generateContent?key=${apiKey}`;
-    let modelSucceeded = false;
+    const label = mi === 0 ? "Primary" : `Backup #${mi}`;
 
-    for (let attempt = 0; attempt <= PER_MODEL_RETRIES; attempt++) {
-      const label = mi === 0 ? "Primary" : `Backup #${mi}`;
-      if (attempt === 0 && mi > 0) {
-        onProgress?.(
-          28 + mi * 6,
-          `Switching to ${label} model (${model})...`
-        );
-      }
+    if (mi > 0) {
+      onProgress?.(28 + mi * 6, `Trying ${label} model (${model})...`);
+    }
+
+    response = await fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+
+    // ✅ Success
+    if (response.ok) break;
+
+    const status = response.status;
+
+    if (status === 429) {
+      // Quota exhausted — skip to next model instantly, no point waiting
+      lastError = `${model}: quota exhausted (429)`;
+      onProgress?.(28 + mi * 6, `${label} quota full — trying next model...`);
+      continue; // next model immediately
+    }
+
+    if (status === 503) {
+      // Temporarily overloaded — one short retry then move on
+      lastError = `${model}: overloaded (503)`;
+      onProgress?.(28 + mi * 6, `${label} busy — retrying in 1.5s...`);
+      await new Promise((r) => setTimeout(r, 1500));
 
       response = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
-
-      if (response.ok) { modelSucceeded = true; break; }
-
-      const retryable = response.status === 429 || response.status === 503;
-      lastError = `${model}: HTTP ${response.status}`;
-
-      if (!retryable) {
-        // Hard error (e.g. 400 bad request) — no point retrying this model
-        const errText = await response.text();
-        lastError = `${model}: ${response.status} — ${errText}`;
-        break;
-      }
-
-      if (attempt < PER_MODEL_RETRIES) {
-        const delay = (attempt + 1) * 3000; // 3s, 6s
-        onProgress?.(
-          28 + mi * 6,
-          `${label} model busy — retrying in ${delay / 1000}s...`
-        );
-        await new Promise((r) => setTimeout(r, delay));
-      }
+      if (response.ok) break;
+      lastError = `${model}: still overloaded after retry`;
+      continue; // next model
     }
 
-    if (modelSucceeded) break;
+    // Any other error (400, 401, 500…) — read and record, skip to next
+    const errText = await response.text().catch(() => String(status));
+    lastError = `${model}: ${status}`;
+    console.error(`[CareerPilot] ${model} error ${status}:`, errText);
+    continue;
   }
 
   onProgress?.(60, "Analyzing skill gaps...");
