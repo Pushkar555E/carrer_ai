@@ -2,8 +2,18 @@ import type { UserProfile, CareerAnalysis } from "@/types";
 import { jsonrepair } from "jsonrepair";
 import { generateId } from "./utils";
 
-const GEMINI_ENDPOINT =
-  "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
+// Free-tier Gemini models in priority order.
+// When one is busy (429/503), the next one is tried automatically.
+const MODEL_WATERFALL = [
+  "gemini-2.5-flash",       // Best quality, try first
+  "gemini-2.0-flash",       // Fallback #1
+  "gemini-2.0-flash-lite",  // Fallback #2 — very fast, less quota pressure
+  "gemini-1.5-flash",       // Fallback #3
+  "gemini-1.5-flash-8b",    // Fallback #4 — smallest, almost always available
+] as const;
+
+const GEMINI_BASE =
+  "https://generativelanguage.googleapis.com/v1beta/models";
 
 function getApiKey(): string {
   const key =
@@ -227,37 +237,64 @@ export async function generateCareerAnalysis(
 
   onProgress?.(25, "Generating career roadmap...");
 
-  // Retry up to 4 times on 429 (quota) and 503 (overloaded) with exponential backoff
+  // ── Multi-model waterfall ─────────────────────────────────
+  // Tries each free model in order. Skips to next on 429/503.
+  // Each model gets up to 2 retries before moving on.
   let response: Response | null = null;
-  const MAX_RETRIES = 4;
-  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
-    response = await fetch(`${GEMINI_ENDPOINT}?key=${apiKey}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
+  let lastError = "";
+  const PER_MODEL_RETRIES = 2;
 
-    if (response.ok) break;
+  for (let mi = 0; mi < MODEL_WATERFALL.length; mi++) {
+    const model = MODEL_WATERFALL[mi];
+    const endpoint = `${GEMINI_BASE}/${model}:generateContent?key=${apiKey}`;
+    let modelSucceeded = false;
 
-    const retryable = response.status === 429 || response.status === 503;
-    if (!retryable || attempt === MAX_RETRIES) {
-      const err = await response.text();
-      throw new Error(`Gemini API error: ${response.status} — ${err}`);
+    for (let attempt = 0; attempt <= PER_MODEL_RETRIES; attempt++) {
+      const label = mi === 0 ? "Primary" : `Backup #${mi}`;
+      if (attempt === 0 && mi > 0) {
+        onProgress?.(
+          28 + mi * 6,
+          `Switching to ${label} model (${model})...`
+        );
+      }
+
+      response = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      if (response.ok) { modelSucceeded = true; break; }
+
+      const retryable = response.status === 429 || response.status === 503;
+      lastError = `${model}: HTTP ${response.status}`;
+
+      if (!retryable) {
+        // Hard error (e.g. 400 bad request) — no point retrying this model
+        const errText = await response.text();
+        lastError = `${model}: ${response.status} — ${errText}`;
+        break;
+      }
+
+      if (attempt < PER_MODEL_RETRIES) {
+        const delay = (attempt + 1) * 3000; // 3s, 6s
+        onProgress?.(
+          28 + mi * 6,
+          `${label} model busy — retrying in ${delay / 1000}s...`
+        );
+        await new Promise((r) => setTimeout(r, delay));
+      }
     }
 
-    const delay = Math.pow(2, attempt) * 2000; // 2s, 4s, 8s, 16s
-    onProgress?.(
-      25 + attempt * 8,
-      `Model busy, retrying in ${delay / 1000}s... (attempt ${attempt + 1}/${MAX_RETRIES})`
-    );
-    await new Promise((r) => setTimeout(r, delay));
+    if (modelSucceeded) break;
   }
 
   onProgress?.(60, "Analyzing skill gaps...");
 
   if (!response || !response.ok) {
-    const err = response ? await response.text() : "No response";
-    throw new Error(`Gemini API error — ${err}`);
+    throw new Error(
+      `All AI models are currently unavailable. Last error: ${lastError}. Please try again in a moment.`
+    );
   }
 
   const data = await response.json();
