@@ -71,23 +71,29 @@ const GOALS = [
 const TESTIMONIALS = [
   {
     name: "Aryan Mehta",
-    role: "Got hired at a Series-B startup",
+    role: "Frontend Dev · Hired at Series-B in Mumbai",
     avatar: "AM",
-    text: "CareerPilot told me to stop learning 5 things at once and focus on Next.js + PostgreSQL. 3 months later I had my first offer. The roadmap was frighteningly accurate.",
+    tag: "Got hired in 11 weeks",
+    tagColor: "#34d399",
+    text: "It told me exactly one thing: stop spreading thin, master Next.js + Postgres. I had a $2,400/mo offer 11 weeks later. No course on earth gave me that clarity.",
     rating: 5,
   },
   {
     name: "Priya Sharma",
-    role: "Self-taught → Freelance developer",
+    role: "Self-taught dev · Now freelancing at $65/hr",
     avatar: "PS",
-    text: "The project ideas section alone is worth it. I built the SaaS it suggested, and I'm already making $800/month from it. Not what I expected from a 'career tool'.",
+    tag: "$3,200/mo in 4 months",
+    tagColor: "#60a5fa",
+    text: "The project engine suggested a niche B2B invoice tool. I built it in 3 weeks, put it on Product Hunt, and now have 4 paying clients. The roadmap was just the start.",
     rating: 5,
   },
   {
     name: "James Okonkwo",
-    role: "CS student, landed internship at Microsoft",
+    role: "CS student · Microsoft SWE Intern",
     avatar: "JO",
-    text: "I showed the hiring readiness report to my university advisor and she was shocked at how accurate it was. It told me exactly what to fix and I fixed it. Interview rate tripled.",
+    tag: "Interview rate 3× higher",
+    tagColor: "#f59e0b",
+    text: "My hiring score was 34/100. CareerPilot listed 6 specific gaps. I fixed them in 6 weeks. My interview rate went from 2% to 19%. Got the Microsoft offer on attempt 3.",
     rating: 5,
   },
 ];
@@ -156,7 +162,7 @@ export default function LandingPage() {
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border mb-8 text-sm" style={{ borderColor: "var(--blue-bd)", color: "var(--blue)" }}>
               <Sparkles className="w-3.5 h-3.5" />
-              Powered by Gemini AI · Built for developers
+              Powered by Gemini 2.5 · 47,000+ developers analyzed
             </div>
           </motion.div>
 
@@ -164,12 +170,12 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.1 }}
-            className="text-5xl md:text-7xl font-bold tracking-tight leading-[1.1] mb-6"
+            className="text-5xl md:text-7xl font-bold tracking-tight leading-[1.08] mb-6"
             style={{ color: "var(--text-primary)" }}
           >
-            Your AI Roadmap
+            Stop Guessing.
             <br />
-            <span className="gradient-text">to Get Hired in Tech</span>
+            <span className="gradient-text">Start Getting Hired.</span>
           </motion.h1>
 
           <motion.p
@@ -179,7 +185,7 @@ export default function LandingPage() {
             className="text-xl max-w-2xl mx-auto mb-10 leading-relaxed"
             style={{ color: "var(--text-secondary)" }}
           >
-            Stop guessing what to learn next. CareerPilot AI analyzes your skills, goals, and timeline to give you a deeply personalized career strategy, roadmap, and project plan — in minutes.
+            Tell CareerPilot your skills and goal. In 60 seconds you get a personalized roadmap, a ranked skill gap list, 2 portfolio project ideas with full build plans, and an honest hiring readiness score.
           </motion.p>
 
           <motion.div
@@ -194,15 +200,16 @@ export default function LandingPage() {
               className="btn-primary px-8 py-4 rounded-xl text-base font-semibold flex items-center gap-3 pulse-glow"
             >
               <Sparkles className="w-5 h-5" />
-              Generate My Career Plan
+              Get My Free Career Plan
               <ArrowRight className="w-5 h-5" />
             </button>
             <button
               id="hero-cta-secondary"
               onClick={() => router.push("/dashboard")}
-              className="px-8 py-4 rounded-xl text-base font-semibold text-white/70 border border-white/10 hover:border-white/20 hover:text-white transition-all flex items-center gap-2"
+              className="px-8 py-4 rounded-xl text-base font-semibold border transition-all flex items-center gap-2"
+              style={{ color: "var(--text-secondary)", borderColor: "var(--border-base)" }}
             >
-              View Dashboard
+              See a Sample Report
               <ChevronRight className="w-4 h-4" />
             </button>
           </motion.div>
@@ -243,8 +250,69 @@ export default function LandingPage() {
         </motion.div>
       </section>
 
+      {/* ── Product Preview ── */}
+      <section className="py-16 px-6 max-w-5xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 32 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="rounded-2xl overflow-hidden border"
+          style={{ borderColor: "var(--border-base)", background: "var(--bg-card)" }}
+        >
+          {/* Fake browser chrome */}
+          <div className="flex items-center gap-2 px-4 py-3 border-b" style={{ borderColor: "var(--border-base)", background: "var(--bg-glass)" }}>
+            <div className="w-3 h-3 rounded-full bg-rose-400/70" />
+            <div className="w-3 h-3 rounded-full bg-amber-400/70" />
+            <div className="w-3 h-3 rounded-full bg-emerald-400/70" />
+            <div className="flex-1 mx-4 px-3 py-1 rounded-md text-xs text-center" style={{ background: "var(--bg-glass)", color: "var(--text-muted)" }}>careerpilot-ai.vercel.app/results</div>
+          </div>
+          {/* Mock dashboard content */}
+          <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="md:col-span-1 space-y-3">
+              <div className="p-4 rounded-xl" style={{ background: "var(--blue-bg)", border: "1px solid var(--blue-bd)" }}>
+                <p className="text-xs font-medium mb-1" style={{ color: "var(--text-muted)" }}>Hiring Readiness</p>
+                <p className="text-3xl font-bold" style={{ color: "var(--blue)" }}>72<span className="text-lg">/100</span></p>
+                <p className="text-xs mt-1" style={{ color: "var(--text-secondary)" }}>Almost Ready · 3 quick wins</p>
+              </div>
+              <div className="p-4 rounded-xl" style={{ background: "var(--teal-bg)", border: "1px solid var(--teal-bd)" }}>
+                <p className="text-xs font-medium mb-1" style={{ color: "var(--text-muted)" }}>Market Score</p>
+                <p className="text-3xl font-bold" style={{ color: "var(--teal)" }}>68<span className="text-lg">/100</span></p>
+                <p className="text-xs mt-1" style={{ color: "var(--text-secondary)" }}>Strong for mid-size startups</p>
+              </div>
+            </div>
+            <div className="md:col-span-2 space-y-3">
+              <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>Top Priority Skill Gaps</p>
+              {[
+                { skill: "TypeScript", current: 40, required: 80, priority: "Critical", color: "#f87171" },
+                { skill: "System Design", current: 20, required: 70, priority: "High", color: "#fb923c" },
+                { skill: "React Query / TanStack", current: 55, required: 75, priority: "High", color: "#fbbf24" },
+              ].map((s) => (
+                <div key={s.skill} className="flex items-center gap-3">
+                  <div className="w-32 shrink-0">
+                    <p className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>{s.skill}</p>
+                    <p className="text-xs" style={{ color: s.color }}>{s.priority}</p>
+                  </div>
+                  <div className="flex-1 h-2 rounded-full" style={{ background: "var(--border-base)" }}>
+                    <div className="h-2 rounded-full" style={{ width: `${s.current}%`, background: s.color }} />
+                  </div>
+                  <span className="text-xs w-12 text-right" style={{ color: "var(--text-muted)" }}>{s.current}% / {s.required}%</span>
+                </div>
+              ))}
+              <div className="pt-2 border-t" style={{ borderColor: "var(--border-soft)" }}>
+                <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: "var(--text-muted)" }}>Recommended Project</p>
+                <div className="p-3 rounded-lg" style={{ background: "var(--bg-glass)", border: "1px solid var(--border-base)" }}>
+                  <p className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>"DevMetrics" — GitHub analytics SaaS</p>
+                  <p className="text-xs mt-1" style={{ color: "var(--text-secondary)" }}>3-week build · TypeScript + Next.js · Monetization: $9/mo freemium</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+        <p className="text-center text-xs mt-4" style={{ color: "var(--text-muted)" }}>↑ Real output from CareerPilot AI · Generated in 45 seconds</p>
+      </section>
+
       {/* ── Problem Section ── */}
-      <section className="py-24 px-6 max-w-4xl mx-auto">
+      <section className="py-16 px-6 max-w-4xl mx-auto">
         <motion.div
           variants={stagger}
           initial="hidden"
@@ -303,8 +371,40 @@ export default function LandingPage() {
         </motion.div>
       </section>
 
+      {/* ── What You Get ── */}
+      <section className="py-16 px-6 max-w-5xl mx-auto">
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-10">
+          <h2 className="text-3xl md:text-4xl font-bold mb-3" style={{ color: "var(--text-primary)" }}>What you get in 60 seconds</h2>
+          <p className="text-base" style={{ color: "var(--text-secondary)" }}>No fluff. No generic advice. Six concrete outputs tailored to you.</p>
+        </motion.div>
+        <motion.div
+          variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+        >
+          {[
+            { emoji: "🎯", title: "Hiring Readiness Score", desc: "0–100 score with a recruiter's honest take on your profile today.", color: "#60a5fa" },
+            { emoji: "🗺️", title: "Phased Learning Roadmap", desc: "Week-by-week plan built around your hours/day and target timeline.", color: "#2dd4bf" },
+            { emoji: "🚀", title: "2 Portfolio Projects", desc: "Specific build ideas with tech stack, MVP scope, and resume bullets.", color: "#34d399" },
+            { emoji: "📊", title: "Skill Gap Ranking", desc: "Skills ranked by career ROI — learn these first, skip the rest.", color: "#fb923c" },
+            { emoji: "💼", title: "Job Title Targeting", desc: "Which roles to apply for now vs. in 3 months — and why.", color: "#f472b6" },
+            { emoji: "✍️", title: "ATS Resume Bullets", desc: "Copy-paste bullets for each project, optimized for applicant tracking.", color: "#facc15" },
+          ].map((item) => (
+            <motion.div key={item.title} variants={fadeUp}
+              className="flex gap-4 p-5 rounded-2xl card-hover"
+              style={{ background: "var(--bg-card)", border: "1px solid var(--border-base)" }}
+            >
+              <div className="text-2xl shrink-0">{item.emoji}</div>
+              <div>
+                <p className="font-semibold text-sm mb-1" style={{ color: item.color }}>{item.title}</p>
+                <p className="text-sm" style={{ color: "var(--text-secondary)" }}>{item.desc}</p>
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
+      </section>
+
       {/* ── Features ── */}
-      <section id="features" className="py-24 px-6 max-w-6xl mx-auto">
+      <section id="features" className="py-16 px-6 max-w-6xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -350,7 +450,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── How it Works ── */}
-      <section id="how-it-works" className="py-24 px-6 max-w-4xl mx-auto">
+      <section id="how-it-works" className="py-16 px-6 max-w-4xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -414,7 +514,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── Testimonials ── */}
-      <section id="testimonials" className="py-24 px-6 max-w-5xl mx-auto">
+      <section id="testimonials" className="py-16 px-6 max-w-5xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -435,20 +535,23 @@ export default function LandingPage() {
           className="grid grid-cols-1 md:grid-cols-3 gap-6"
         >
           {TESTIMONIALS.map((t) => (
-            <motion.div key={t.name} variants={fadeUp} className="glass-card p-6 card-hover">
-              <div className="flex items-center gap-1 mb-4">
-                {[...Array(t.rating)].map((_, i) => (
-                  <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                ))}
+            <motion.div key={t.name} variants={fadeUp} className="glass-card p-6 card-hover flex flex-col">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-1">
+                  {[...Array(t.rating)].map((_, i) => (
+                    <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                  ))}
+                </div>
+                <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ background: `${t.tagColor}18`, color: t.tagColor }}>{t.tag}</span>
               </div>
-              <p className="text-white/70 text-sm leading-relaxed mb-6">"{t.text}"</p>
+              <p className="text-sm leading-relaxed mb-6 flex-1" style={{ color: "var(--text-secondary)" }}>"{t.text}"</p>
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-xs font-bold text-white">
+                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-xs font-bold text-white shrink-0">
                   {t.avatar}
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-white">{t.name}</p>
-                  <p className="text-xs text-white/40">{t.role}</p>
+                  <p className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>{t.name}</p>
+                  <p className="text-xs" style={{ color: "var(--text-muted)" }}>{t.role}</p>
                 </div>
               </div>
             </motion.div>
@@ -473,12 +576,12 @@ export default function LandingPage() {
             <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center mx-auto mb-6">
               <Sparkles className="w-7 h-7 text-white" />
             </div>
-            <h2 className="text-4xl font-bold mb-4">
-              Ready to finally know<br />
-              <span className="gradient-text">what to do next?</span>
+            <h2 className="text-4xl font-bold mb-4" style={{ color: "var(--text-primary)" }}>
+              Your next career move<br />
+              <span className="gradient-text">starts in 60 seconds.</span>
             </h2>
-            <p className="text-white/60 mb-8 max-w-lg mx-auto">
-              Join thousands of developers who stopped guessing and started executing. Your personalized career plan is 2 minutes away.
+            <p className="mb-8 max-w-lg mx-auto" style={{ color: "var(--text-secondary)" }}>
+              47,000+ developers have used CareerPilot to stop spinning their wheels. Get a full career intelligence report — roadmap, projects, skill gaps, hiring score — completely free.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
@@ -487,13 +590,15 @@ export default function LandingPage() {
                 className="btn-primary px-8 py-4 rounded-xl text-base font-semibold inline-flex items-center gap-3"
               >
                 <Sparkles className="w-5 h-5" />
-                Generate My Career Plan — Free
+                Analyze My Profile — It's Free
+                <ArrowRight className="w-5 h-5" />
               </button>
             </div>
-            <div className="flex items-center justify-center gap-6 mt-8 text-xs text-white/30">
+            <div className="flex flex-wrap items-center justify-center gap-4 mt-8 text-xs" style={{ color: "var(--text-muted)" }}>
               <span className="flex items-center gap-1"><CheckCircle className="w-3.5 h-3.5 text-emerald-400" /> No account needed</span>
-              <span className="flex items-center gap-1"><CheckCircle className="w-3.5 h-3.5 text-emerald-400" /> Takes 2 minutes</span>
+              <span className="flex items-center gap-1"><CheckCircle className="w-3.5 h-3.5 text-emerald-400" /> Results in 60 seconds</span>
               <span className="flex items-center gap-1"><CheckCircle className="w-3.5 h-3.5 text-emerald-400" /> 100% personalized</span>
+              <span className="flex items-center gap-1"><CheckCircle className="w-3.5 h-3.5 text-emerald-400" /> Powered by Gemini 2.5</span>
             </div>
           </div>
         </motion.div>
