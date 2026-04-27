@@ -6,6 +6,7 @@ import {
   Code2, Star, CheckCircle, ChevronRight, Brain, Rocket,
   BarChart3, Users, Clock, Shield
 } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const FEATURES = [
   {
@@ -111,39 +112,40 @@ export default function LandingPage() {
   const router = useRouter();
 
   return (
-    <div className="min-h-screen bg-[#08101c] text-white overflow-x-hidden">
-      {/* ── Nav ── */}
-      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 glass border-b border-white/5">
+    <div className="min-h-screen overflow-x-hidden" style={{ backgroundColor: "var(--bg)", color: "var(--text-primary)" }}>      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 glass border-b border-white/5">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
             <Sparkles className="w-4 h-4 text-white" />
           </div>
-          <span className="font-bold text-white text-lg tracking-tight">
-            CareerPilot<span className="text-violet-400"> AI</span>
+          <span className="font-bold text-lg tracking-tight" style={{ color: "var(--text-primary)" }}>
+            CareerPilot<span style={{ color: "var(--blue)" }}> AI</span>
           </span>
         </div>
-        <div className="hidden md:flex items-center gap-8 text-sm text-white/60">
-          <a href="#features" className="hover:text-white transition-colors">Features</a>
-          <a href="#how-it-works" className="hover:text-white transition-colors">How it works</a>
-          <a href="#testimonials" className="hover:text-white transition-colors">Reviews</a>
+        <div className="hidden md:flex items-center gap-8 text-sm" style={{ color: "var(--text-secondary)" }}>
+          <a href="#features" className="hover:opacity-100 transition-opacity">Features</a>
+          <a href="#how-it-works" className="hover:opacity-100 transition-opacity">How it works</a>
+          <a href="#testimonials" className="hover:opacity-100 transition-opacity">Reviews</a>
         </div>
-        <button
-          id="nav-cta"
-          onClick={() => router.push("/onboarding")}
-          className="btn-primary px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2"
-        >
-          Get Started Free
-          <ArrowRight className="w-3.5 h-3.5" />
-        </button>
+        <div className="flex items-center gap-3">
+          <ThemeToggle />
+          <button
+            id="nav-cta"
+            onClick={() => router.push("/onboarding")}
+            className="btn-primary px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2"
+          >
+            Get Started Free
+            <ArrowRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
       </nav>
 
       {/* ── Hero ── */}
       <section className="relative min-h-screen flex items-center justify-center pt-24 pb-20 grid-bg hero-glow">
         {/* Orbs */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-violet-600/10 rounded-full blur-3xl" />
-          <div className="absolute top-1/3 right-1/4 w-80 h-80 bg-cyan-500/8 rounded-full blur-3xl" />
-          <div className="absolute bottom-1/4 left-1/2 w-72 h-72 bg-indigo-600/8 rounded-full blur-3xl" />
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-600/8 rounded-full blur-3xl dark:bg-blue-600/10" />
+          <div className="absolute top-1/3 right-1/4 w-80 h-80 bg-teal-500/6 rounded-full blur-3xl" />
+          <div className="absolute bottom-1/4 left-1/2 w-72 h-72 bg-indigo-600/6 rounded-full blur-3xl" />
         </div>
 
         <div className="relative max-w-5xl mx-auto px-6 text-center">
@@ -152,7 +154,7 @@ export default function LandingPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-violet-500/30 text-sm text-violet-300 mb-8">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border mb-8 text-sm" style={{ borderColor: "var(--blue-bd)", color: "var(--blue)" }}>
               <Sparkles className="w-3.5 h-3.5" />
               Powered by Gemini AI · Built for developers
             </div>
@@ -163,6 +165,7 @@ export default function LandingPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.1 }}
             className="text-5xl md:text-7xl font-bold tracking-tight leading-[1.1] mb-6"
+            style={{ color: "var(--text-primary)" }}
           >
             Your AI Roadmap
             <br />
@@ -173,7 +176,8 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.25 }}
-            className="text-xl text-white/60 max-w-2xl mx-auto mb-10 leading-relaxed"
+            className="text-xl max-w-2xl mx-auto mb-10 leading-relaxed"
+            style={{ color: "var(--text-secondary)" }}
           >
             Stop guessing what to learn next. CareerPilot AI analyzes your skills, goals, and timeline to give you a deeply personalized career strategy, roadmap, and project plan — in minutes.
           </motion.p>
@@ -307,7 +311,7 @@ export default function LandingPage() {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-400 text-xs font-medium mb-6">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium mb-6" style={{ background: "var(--blue-bg)", border: "1px solid var(--blue-bd)", color: "var(--blue)" }}>
             <Sparkles className="w-3 h-3" /> Features
           </div>
           <h2 className="text-4xl md:text-5xl font-bold mb-4">Your complete career intelligence suite</h2>
@@ -353,7 +357,7 @@ export default function LandingPage() {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-medium mb-6">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium mb-6" style={{ background: "var(--teal-bg)", border: "1px solid var(--teal-bd)", color: "var(--teal)" }}>
             How it works
           </div>
           <h2 className="text-4xl font-bold mb-4">From confused to confident in 3 steps</h2>
@@ -439,7 +443,7 @@ export default function LandingPage() {
               </div>
               <p className="text-white/70 text-sm leading-relaxed mb-6">"{t.text}"</p>
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-xs font-bold">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-xs font-bold text-white">
                   {t.avatar}
                 </div>
                 <div>
@@ -460,13 +464,13 @@ export default function LandingPage() {
           viewport={{ once: true }}
           className="max-w-3xl mx-auto text-center p-12 rounded-3xl relative overflow-hidden"
           style={{
-            background: "linear-gradient(135deg, rgba(124,58,237,0.15), rgba(79,70,229,0.1))",
-            border: "1px solid rgba(139,92,246,0.25)",
+            background: "linear-gradient(135deg, var(--blue-bg), rgba(79,70,229,0.08))",
+            border: "1px solid var(--blue-bd)",
           }}
         >
-          <div className="absolute inset-0 bg-gradient-to-br from-violet-600/10 to-transparent pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-600/8 to-transparent pointer-events-none" />
           <div className="relative">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center mx-auto mb-6">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center mx-auto mb-6">
               <Sparkles className="w-7 h-7 text-white" />
             </div>
             <h2 className="text-4xl font-bold mb-4">
@@ -496,20 +500,20 @@ export default function LandingPage() {
       </section>
 
       {/* ── Footer ── */}
-      <footer className="border-t border-white/5 py-10 px-6">
+      <footer className="border-t py-10 px-6" style={{ borderColor: "var(--border-soft)" }}>
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-md bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center">
+            <div className="w-6 h-6 rounded-md bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
               <Sparkles className="w-3 h-3 text-white" />
             </div>
-            <span className="font-bold text-white/80 text-sm">CareerPilot AI</span>
+            <span className="font-bold text-sm" style={{ color: "var(--text-secondary)" }}>CareerPilot AI</span>
           </div>
-          <p className="text-white/30 text-sm">
+          <p className="text-sm" style={{ color: "var(--text-muted)" }}>
             Built for developers who are serious about their career.
           </p>
           <div className="flex items-center gap-1">
-            <Code2 className="w-3.5 h-3.5 text-violet-400" />
-            <span className="text-white/30 text-xs">Powered by Gemini AI</span>
+            <Code2 className="w-3.5 h-3.5" style={{ color: "var(--blue)" }} />
+            <span className="text-xs" style={{ color: "var(--text-muted)" }}>Powered by Gemini AI</span>
           </div>
         </div>
       </footer>

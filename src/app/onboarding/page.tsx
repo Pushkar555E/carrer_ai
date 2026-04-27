@@ -6,6 +6,7 @@ import { Sparkles, ArrowRight, ArrowLeft } from "lucide-react";
 import { useCareerStore } from "@/store/careerStore";
 import { generateCareerAnalysis } from "@/lib/ai";
 import type { UserProfile, SkillLevel, GoalType, TechStack, Timeline } from "@/types";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const SKILLS_LIST = [
   "HTML","CSS","JavaScript","TypeScript","React","Next.js","Vue","Angular","Svelte",
@@ -123,19 +124,22 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#08101c] flex flex-col items-center justify-center px-4 py-12">
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12" style={{ backgroundColor: "var(--bg)" }}>
       {/* Background */}
       <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-violet-600/8 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/3 right-1/4 w-80 h-80 bg-cyan-500/6 rounded-full blur-3xl" />
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-600/8 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/3 right-1/4 w-80 h-80 bg-teal-500/5 rounded-full blur-3xl" />
       </div>
 
       {/* Logo */}
-      <div className="flex items-center gap-2 mb-8 relative">
-        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center">
-          <Sparkles className="w-4 h-4 text-white" />
+      <div className="flex items-center justify-between w-full max-w-xl mb-8 relative">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+            <Sparkles className="w-4 h-4 text-white" />
+          </div>
+          <span className="font-bold text-lg" style={{ color: "var(--text-primary)" }}>CareerPilot <span style={{ color: "var(--blue)" }}>AI</span></span>
         </div>
-        <span className="font-bold text-white text-lg">CareerPilot <span className="text-violet-400">AI</span></span>
+        <ThemeToggle />
       </div>
 
       {step !== "generating" && (
