@@ -1,33 +1,42 @@
 @import "tailwindcss";
 
+/* ─── Design Tokens ─────────────────────────────────────── */
+/* Palette: Dark Navy + Royal Blue + Teal — inspired by Linear/Vercel  */
+/* Primary accent : hsl(217 91% 60%)  → bright royal blue              */
+/* Secondary accent: hsl(175 72% 48%) → teal/seafoam                   */
+/* Tertiary accent : hsl(250 84% 68%) → soft indigo (replaces violet)  */
+
 @layer base {
   :root {
-    --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 5%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 5%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 246 83% 65%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 10%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 10%;
-    --muted-foreground: 0 0% 60%;
-    --accent: 246 83% 65%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 12%;
-    --input: 0 0% 12%;
-    --ring: 246 83% 65%;
+    --background: 222 30% 6%;          /* #08101c deep navy */
+    --foreground: 210 40% 97%;
+    --card: 222 28% 8%;
+    --card-foreground: 210 40% 97%;
+    --popover: 222 28% 8%;
+    --popover-foreground: 210 40% 97%;
+    --primary: 217 91% 60%;            /* royal blue */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 222 24% 13%;
+    --secondary-foreground: 210 40% 97%;
+    --muted: 222 24% 13%;
+    --muted-foreground: 215 20% 55%;
+    --accent: 175 72% 48%;             /* teal */
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 72% 58%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 20% 14%;
+    --input: 220 20% 14%;
+    --ring: 217 91% 60%;
     --radius: 0.75rem;
-    --violet: 246 83% 65%;
-    --violet-light: 246 83% 75%;
-    --cyan: 192 91% 59%;
-    --emerald: 158 64% 52%;
-    --amber: 38 92% 50%;
-    --rose: 350 89% 60%;
+
+    /* Named palette variables used directly in components */
+    --blue: 217 91% 60%;
+    --blue-light: 213 100% 70%;
+    --teal: 175 72% 48%;
+    --indigo: 250 84% 68%;
+    --emerald: 158 64% 48%;
+    --amber: 38 85% 52%;
+    --rose: 350 80% 60%;
   }
 }
 
@@ -47,80 +56,74 @@
   }
 }
 
-/* Premium scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: hsl(0 0% 5%);
-}
+/* ─── Scrollbar ─────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: hsl(222 28% 8%); }
 ::-webkit-scrollbar-thumb {
-  background: hsl(246 83% 65% / 0.4);
+  background: hsl(217 91% 60% / 0.35);
   border-radius: 3px;
 }
-::-webkit-scrollbar-thumb:hover {
-  background: hsl(246 83% 65% / 0.7);
-}
+::-webkit-scrollbar-thumb:hover { background: hsl(217 91% 60% / 0.6); }
 
-/* Gradient text utilities */
+/* ─── Gradient Text ─────────────────────────────────────── */
+/* Primary gradient: blue → teal */
 .gradient-text {
-  background: linear-gradient(135deg, #a78bfa, #818cf8, #38bdf8);
+  background: linear-gradient(135deg, #60a5fa, #2dd4bf);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
+/* Warm: amber → rose */
 .gradient-text-warm {
-  background: linear-gradient(135deg, #f59e0b, #ef4444, #ec4899);
+  background: linear-gradient(135deg, #fbbf24, #f87171);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
+/* Cool: teal → indigo */
 .gradient-text-emerald {
-  background: linear-gradient(135deg, #10b981, #06b6d4);
+  background: linear-gradient(135deg, #2dd4bf, #818cf8);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-/* Glass morphism */
+/* ─── Glass Cards ───────────────────────────────────────── */
 .glass {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 255, 0.025);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 255, 0.028);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.07);
   border-radius: 1rem;
 }
 
 .glass-strong {
-  background: rgba(139, 92, 246, 0.08);
+  background: rgba(59, 130, 246, 0.07);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(139, 92, 246, 0.2);
+  border: 1px solid rgba(59, 130, 246, 0.18);
 }
 
-/* Glow effects */
+/* ─── Glows ─────────────────────────────────────────────── */
 .glow-violet {
-  box-shadow: 0 0 40px rgba(139, 92, 246, 0.15), 0 0 80px rgba(139, 92, 246, 0.05);
+  box-shadow: 0 0 40px rgba(99, 102, 241, 0.12), 0 0 80px rgba(99, 102, 241, 0.05);
 }
-
 .glow-cyan {
-  box-shadow: 0 0 40px rgba(56, 189, 248, 0.15), 0 0 80px rgba(56, 189, 248, 0.05);
+  box-shadow: 0 0 40px rgba(45, 212, 191, 0.12), 0 0 80px rgba(45, 212, 191, 0.05);
 }
-
 .glow-emerald {
-  box-shadow: 0 0 40px rgba(16, 185, 129, 0.15), 0 0 80px rgba(16, 185, 129, 0.05);
+  box-shadow: 0 0 40px rgba(52, 211, 153, 0.12), 0 0 80px rgba(52, 211, 153, 0.05);
 }
 
-/* Noise texture overlay */
+/* ─── Noise Overlay ─────────────────────────────────────── */
 .noise::before {
   content: '';
   position: absolute;
@@ -128,90 +131,80 @@
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
   pointer-events: none;
   z-index: 0;
-  opacity: 0.4;
+  opacity: 0.3;
   border-radius: inherit;
 }
 
-/* Shimmer animation */
+/* ─── Shimmer ───────────────────────────────────────────── */
 @keyframes shimmer {
-  0% { background-position: -200% center; }
-  100% { background-position: 200% center; }
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
 }
-
 .shimmer {
-  background: linear-gradient(90deg, transparent 25%, rgba(255,255,255,0.1) 50%, transparent 75%);
+  background: linear-gradient(90deg, transparent 25%, rgba(255,255,255,0.07) 50%, transparent 75%);
   background-size: 200% auto;
   animation: shimmer 2s linear infinite;
 }
 
-/* Pulse glow */
+/* ─── Pulse Glow ────────────────────────────────────────── */
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 20px rgba(139, 92, 246, 0.3); }
-  50% { box-shadow: 0 0 40px rgba(139, 92, 246, 0.6), 0 0 80px rgba(139, 92, 246, 0.2); }
+  0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.25); }
+  50%       { box-shadow: 0 0 40px rgba(59, 130, 246, 0.5), 0 0 80px rgba(59, 130, 246, 0.15); }
 }
+.pulse-glow { animation: pulse-glow 3s ease-in-out infinite; }
 
-.pulse-glow {
-  animation: pulse-glow 3s ease-in-out infinite;
-}
-
-/* Floating animation */
+/* ─── Float ─────────────────────────────────────────────── */
 @keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
+  0%, 100% { transform: translateY(0px);   }
+  50%       { transform: translateY(-10px); }
 }
+.float { animation: float 4s ease-in-out infinite; }
 
-.float {
-  animation: float 4s ease-in-out infinite;
-}
-
-/* Grid background */
+/* ─── Grid Background ───────────────────────────────────── */
 .grid-bg {
-  background-image: 
-    linear-gradient(rgba(139, 92, 246, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(139, 92, 246, 0.03) 1px, transparent 1px);
+  background-image:
+    linear-gradient(rgba(59, 130, 246, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(59, 130, 246, 0.04) 1px, transparent 1px);
   background-size: 60px 60px;
 }
 
-/* Radial glow backgrounds */
+/* ─── Hero Glow ─────────────────────────────────────────── */
+/* Soft navy-to-blue gradient, no neon blasts */
 .hero-glow {
-  background: radial-gradient(ellipse 80% 60% at 50% -20%, rgba(139, 92, 246, 0.2) 0%, transparent 60%),
-              radial-gradient(ellipse 40% 30% at 80% 50%, rgba(56, 189, 248, 0.1) 0%, transparent 50%),
-              radial-gradient(ellipse 40% 30% at 20% 60%, rgba(16, 185, 129, 0.08) 0%, transparent 50%);
+  background:
+    radial-gradient(ellipse 80% 60% at 50% -20%, rgba(59, 130, 246, 0.18) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 30% at 80% 50%,  rgba(45, 212, 191, 0.09) 0%, transparent 50%),
+    radial-gradient(ellipse 40% 30% at 20% 60%,  rgba(99, 102, 241, 0.07) 0%, transparent 50%);
 }
 
-/* Progress bar animation */
+/* ─── Progress ──────────────────────────────────────────── */
 @keyframes progress-fill {
   from { width: 0%; }
-  to { width: var(--progress); }
+  to   { width: var(--progress); }
 }
+.progress-animated { animation: progress-fill 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
 
-.progress-animated {
-  animation: progress-fill 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-}
-
-/* Score ring animation */
+/* ─── Score Ring ────────────────────────────────────────── */
 @keyframes score-ring {
   from { stroke-dashoffset: 283; }
-  to { stroke-dashoffset: var(--offset); }
+  to   { stroke-dashoffset: var(--offset); }
 }
+.score-ring-animate { animation: score-ring 1.8s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
 
-.score-ring-animate {
-  animation: score-ring 1.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-}
-
-/* Card hover lift */
+/* ─── Card Hover ────────────────────────────────────────── */
 .card-hover {
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
-
 .card-hover:hover {
   transform: translateY(-4px);
-  box-shadow: 0 20px 60px rgba(139, 92, 246, 0.15);
+  box-shadow: 0 20px 60px rgba(59, 130, 246, 0.12);
 }
 
-/* Button styles */
+/* ─── Buttons ───────────────────────────────────────────── */
+/* Clean blue → indigo instead of neon purple */
 .btn-primary {
-  background: linear-gradient(135deg, #7c3aed, #4f46e5);
+  background: linear-gradient(135deg, #2563eb, #4f46e5);
   color: white;
   border: none;
   cursor: pointer;
@@ -219,38 +212,35 @@
   position: relative;
   overflow: hidden;
 }
-
 .btn-primary::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+  background: linear-gradient(135deg, rgba(255,255,255,0.08), transparent);
 }
-
 .btn-primary:hover {
-  background: linear-gradient(135deg, #6d28d9, #4338ca);
-  box-shadow: 0 0 30px rgba(124, 58, 237, 0.4);
+  background: linear-gradient(135deg, #1d4ed8, #4338ca);
+  box-shadow: 0 0 30px rgba(37, 99, 235, 0.4);
   transform: translateY(-1px);
 }
 
-/* Loading skeleton */
+/* ─── Skeleton ──────────────────────────────────────────── */
 @keyframes skeleton-wave {
-  0% { background-position: -200% center; }
-  100% { background-position: 200% center; }
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
 }
-
 .skeleton {
-  background: linear-gradient(90deg, 
-    rgba(255,255,255,0.05) 25%, 
-    rgba(255,255,255,0.1) 50%, 
-    rgba(255,255,255,0.05) 75%
+  background: linear-gradient(90deg,
+    rgba(255,255,255,0.04) 25%,
+    rgba(255,255,255,0.08) 50%,
+    rgba(255,255,255,0.04) 75%
   );
   background-size: 200% auto;
   animation: skeleton-wave 1.5s linear infinite;
   border-radius: 0.5rem;
 }
 
-/* Tag chip */
+/* ─── Chips / Tags ──────────────────────────────────────── */
 .chip {
   display: inline-flex;
   align-items: center;
@@ -261,96 +251,92 @@
   border: 1px solid;
 }
 
+/* Blue (replaces violet) */
 .chip-violet {
-  background: rgba(139, 92, 246, 0.1);
-  border-color: rgba(139, 92, 246, 0.3);
-  color: #a78bfa;
+  background: rgba(59, 130, 246, 0.1);
+  border-color: rgba(59, 130, 246, 0.28);
+  color: #93c5fd;
 }
 
+/* Teal (replaces cyan) */
 .chip-cyan {
-  background: rgba(56, 189, 248, 0.1);
-  border-color: rgba(56, 189, 248, 0.3);
-  color: #38bdf8;
+  background: rgba(45, 212, 191, 0.1);
+  border-color: rgba(45, 212, 191, 0.28);
+  color: #5eead4;
 }
 
 .chip-emerald {
-  background: rgba(16, 185, 129, 0.1);
-  border-color: rgba(16, 185, 129, 0.3);
-  color: #34d399;
+  background: rgba(52, 211, 153, 0.1);
+  border-color: rgba(52, 211, 153, 0.28);
+  color: #6ee7b7;
 }
 
 .chip-amber {
-  background: rgba(245, 158, 11, 0.1);
-  border-color: rgba(245, 158, 11, 0.3);
-  color: #fbbf24;
+  background: rgba(251, 191, 36, 0.1);
+  border-color: rgba(251, 191, 36, 0.28);
+  color: #fcd34d;
 }
 
 .chip-rose {
-  background: rgba(244, 63, 94, 0.1);
-  border-color: rgba(244, 63, 94, 0.3);
-  color: #fb7185;
+  background: rgba(248, 113, 113, 0.1);
+  border-color: rgba(248, 113, 113, 0.28);
+  color: #fca5a5;
 }
 
-/* Divider gradient */
+/* ─── Divider ───────────────────────────────────────────── */
 .divider {
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.4), transparent);
+  background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.35), transparent);
 }
 
-/* Custom range input */
+/* ─── Range Input ───────────────────────────────────────── */
 input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
   background: transparent;
   cursor: pointer;
 }
-
 input[type="range"]::-webkit-slider-runnable-track {
-  background: rgba(139, 92, 246, 0.2);
+  background: rgba(59, 130, 246, 0.2);
   height: 6px;
   border-radius: 3px;
 }
-
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #7c3aed, #4f46e5);
+  background: linear-gradient(135deg, #2563eb, #4f46e5);
   margin-top: -6px;
-  box-shadow: 0 0 10px rgba(124, 58, 237, 0.5);
+  box-shadow: 0 0 10px rgba(37, 99, 235, 0.5);
 }
 
-/* Native select dropdown fix - browser uses OS default white bg for option list */
+/* ─── Select ────────────────────────────────────────────── */
 select {
-  background-color: #141420;
+  background-color: #0d1626;
   color: #ffffff;
   color-scheme: dark;
 }
-
 select option {
-  background-color: #1a1a2e;
+  background-color: #111827;
   color: #ffffff;
 }
-
 select option:hover,
 select option:checked {
-  background-color: #4f46e5;
+  background-color: #2563eb;
   color: #ffffff;
 }
 
-/* Tooltip */
-.tooltip {
-  position: relative;
-}
+/* ─── Tooltip ───────────────────────────────────────────── */
+.tooltip { position: relative; }
 .tooltip::after {
   content: attr(data-tip);
   position: absolute;
   bottom: calc(100% + 8px);
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(15, 15, 30, 0.95);
-  border: 1px solid rgba(139, 92, 246, 0.3);
+  background: rgba(8, 16, 28, 0.95);
+  border: 1px solid rgba(59, 130, 246, 0.25);
   color: #e2e8f0;
   padding: 0.4rem 0.75rem;
   border-radius: 0.5rem;
@@ -360,6 +346,4 @@ select option:checked {
   pointer-events: none;
   transition: opacity 0.2s;
 }
-.tooltip:hover::after {
-  opacity: 1;
-}
+.tooltip:hover::after { opacity: 1; }

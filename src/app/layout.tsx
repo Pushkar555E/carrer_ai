@@ -47,7 +47,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={inter.variable}>
-      <body className="bg-[#080810] text-white antialiased overflow-x-hidden">
+      <body className="bg-[#08101c] text-white antialiased overflow-x-hidden">
         {children}
       </body>
     </html>

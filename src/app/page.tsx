@@ -111,7 +111,7 @@ export default function LandingPage() {
   const router = useRouter();
 
   return (
-    <div className="min-h-screen bg-[#080810] text-white overflow-x-hidden">
+    <div className="min-h-screen bg-[#08101c] text-white overflow-x-hidden">
       {/* ── Nav ── */}
       <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 glass border-b border-white/5">
         <div className="flex items-center gap-2">
