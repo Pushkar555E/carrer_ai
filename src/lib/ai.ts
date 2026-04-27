@@ -2,25 +2,39 @@ import type { UserProfile, CareerAnalysis } from "@/types";
 import { jsonrepair } from "jsonrepair";
 import { generateId } from "./utils";
 
-// Free-tier Gemini models in priority order.
-// When one is busy (429/503), the next one is tried automatically.
-const MODEL_WATERFALL = [
-  "gemini-2.5-flash",       // Best quality, try first
-  "gemini-2.0-flash",       // Fallback #1
-  "gemini-2.0-flash-lite",  // Fallback #2 — very fast, less quota pressure
-  "gemini-1.5-flash",       // Fallback #3
-  "gemini-1.5-flash-8b",    // Fallback #4 — smallest, almost always available
+// ── Free-tier Gemini models (confirmed working model IDs) ──
+const MODELS = [
+  "gemini-2.5-flash-preview-04-17", // Best quality (also try stable alias below)
+  "gemini-2.5-flash",               // Stable alias
+  "gemini-2.0-flash",               // 200 RPD free
+  "gemini-2.0-flash-lite",          // 1500 RPD free — very generous
+  "gemini-1.5-flash",               // 1500 RPD free
+  "gemini-1.5-flash-8b",            // 1500 RPD free — smallest, fastest
 ] as const;
 
 const GEMINI_BASE =
   "https://generativelanguage.googleapis.com/v1beta/models";
 
-function getApiKey(): string {
-  const key =
+// ── Multi-key support ──────────────────────────────────────
+// Add NEXT_PUBLIC_GEMINI_API_KEY_2, _3, etc. in Vercel env vars
+// to multiply your daily quota. Free keys from: aistudio.google.com
+function getApiKeys(): string[] {
+  const keys: string[] = [];
+  const primary =
     process.env.NEXT_PUBLIC_GEMINI_API_KEY ||
     process.env.GEMINI_API_KEY ||
     "";
-  return key;
+  if (primary) keys.push(primary);
+
+  // Support up to 5 additional keys
+  for (let i = 2; i <= 6; i++) {
+    const k =
+      process.env[`NEXT_PUBLIC_GEMINI_API_KEY_${i}`] ||
+      process.env[`GEMINI_API_KEY_${i}`] ||
+      "";
+    if (k && k !== primary) keys.push(k);
+  }
+  return keys;
 }
 
 function buildSystemPrompt(): string {
@@ -207,11 +221,11 @@ export async function generateCareerAnalysis(
   profile: UserProfile,
   onProgress?: (p: number, step: string) => void
 ): Promise<CareerAnalysis> {
-  const apiKey = getApiKey();
+  const apiKeys = getApiKeys();
 
-  if (!apiKey) {
+  if (apiKeys.length === 0) {
     throw new Error(
-      "Gemini API key is not set. Add NEXT_PUBLIC_GEMINI_API_KEY to your .env.local"
+      "Gemini API key not set. Add NEXT_PUBLIC_GEMINI_API_KEY to your .env.local or Vercel environment variables."
     );
   }
 
@@ -230,71 +244,80 @@ export async function generateCareerAnalysis(
       temperature: 0.8,
       topK: 40,
       topP: 0.95,
-      maxOutputTokens: 8192,
+      maxOutputTokens: 4096, // Reduced from 8192 to halve quota usage per request
       responseMimeType: "application/json",
     },
   };
 
   onProgress?.(25, "Generating career roadmap...");
 
-  // ── Multi-model waterfall ─────────────────────────────────────────────
-  // Strategy:
-  //   429 (quota exhausted)  → instantly skip to next model, NO delay.
-  //                            Waiting doesn't help — quota resets daily.
-  //   503 (overloaded)       → 1 retry with 1.5s delay, then skip.
-  //   Other errors           → skip immediately.
-  // Worst-case wall time: ~7.5s across all 5 models (safe for Vercel 10s limit).
+  // ── Key × Model waterfall ──────────────────────────────────────────────
+  // Iterates every (API key × model) combination.
+  // - 429 (quota exhausted on this key+model) → try next combination instantly
+  // - 503 (overloaded) → 1 retry with 1.5s, then next combination
+  // - 404 (bad model name) → skip immediately
   let response: Response | null = null;
   let lastError = "";
+  let attemptCount = 0;
 
-  for (let mi = 0; mi < MODEL_WATERFALL.length; mi++) {
-    const model = MODEL_WATERFALL[mi];
-    const endpoint = `${GEMINI_BASE}/${model}:generateContent?key=${apiKey}`;
-    const label = mi === 0 ? "Primary" : `Backup #${mi}`;
+  outer:
+  for (const apiKey of apiKeys) {
+    for (let mi = 0; mi < MODELS.length; mi++) {
+      const model = MODELS[mi];
+      const endpoint = `${GEMINI_BASE}/${model}:generateContent?key=${apiKey}`;
+      const keyLabel = apiKeys.length > 1
+        ? `Key${apiKeys.indexOf(apiKey) + 1}/${model}`
+        : model;
 
-    if (mi > 0) {
-      onProgress?.(28 + mi * 6, `Trying ${label} model (${model})...`);
-    }
-
-    response = await fetch(endpoint, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-
-    // ✅ Success
-    if (response.ok) break;
-
-    const status = response.status;
-
-    if (status === 429) {
-      // Quota exhausted — skip to next model instantly, no point waiting
-      lastError = `${model}: quota exhausted (429)`;
-      onProgress?.(28 + mi * 6, `${label} quota full — trying next model...`);
-      continue; // next model immediately
-    }
-
-    if (status === 503) {
-      // Temporarily overloaded — one short retry then move on
-      lastError = `${model}: overloaded (503)`;
-      onProgress?.(28 + mi * 6, `${label} busy — retrying in 1.5s...`);
-      await new Promise((r) => setTimeout(r, 1500));
+      attemptCount++;
+      if (attemptCount > 1) {
+        onProgress?.(
+          25 + Math.min(attemptCount * 4, 30),
+          `Trying ${keyLabel}...`
+        );
+      }
 
       response = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
-      if (response.ok) break;
-      lastError = `${model}: still overloaded after retry`;
-      continue; // next model
-    }
 
-    // Any other error (400, 401, 500…) — read and record, skip to next
-    const errText = await response.text().catch(() => String(status));
-    lastError = `${model}: ${status}`;
-    console.error(`[CareerPilot] ${model} error ${status}:`, errText);
-    continue;
+      if (response.ok) break outer;
+
+      const status = response.status;
+
+      if (status === 404) {
+        lastError = `${model}: not found (404)`;
+        continue;
+      }
+
+      if (status === 429) {
+        lastError = `${model}: quota exhausted (429)`;
+        onProgress?.(
+          25 + Math.min(attemptCount * 4, 30),
+          `${model} quota full — trying next...`
+        );
+        continue;
+      }
+
+      if (status === 503) {
+        lastError = `${model}: overloaded (503)`;
+        await new Promise((r) => setTimeout(r, 1500));
+        response = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        if (response.ok) break outer;
+        lastError = `${model}: still overloaded`;
+        continue;
+      }
+
+      const errText = await response.text().catch(() => String(status));
+      lastError = `${model}: ${status}`;
+      console.error(`[CareerPilot] ${model} HTTP ${status}:`, errText.slice(0, 200));
+    }
   }
 
   onProgress?.(60, "Analyzing skill gaps...");
