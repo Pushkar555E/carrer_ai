@@ -227,17 +227,37 @@ export async function generateCareerAnalysis(
 
   onProgress?.(25, "Generating career roadmap...");
 
-  const response = await fetch(`${GEMINI_ENDPOINT}?key=${apiKey}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
+  // Retry up to 4 times on 429 (quota) and 503 (overloaded) with exponential backoff
+  let response: Response | null = null;
+  const MAX_RETRIES = 4;
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    response = await fetch(`${GEMINI_ENDPOINT}?key=${apiKey}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+
+    if (response.ok) break;
+
+    const retryable = response.status === 429 || response.status === 503;
+    if (!retryable || attempt === MAX_RETRIES) {
+      const err = await response.text();
+      throw new Error(`Gemini API error: ${response.status} — ${err}`);
+    }
+
+    const delay = Math.pow(2, attempt) * 2000; // 2s, 4s, 8s, 16s
+    onProgress?.(
+      25 + attempt * 8,
+      `Model busy, retrying in ${delay / 1000}s... (attempt ${attempt + 1}/${MAX_RETRIES})`
+    );
+    await new Promise((r) => setTimeout(r, delay));
+  }
 
   onProgress?.(60, "Analyzing skill gaps...");
 
-  if (!response.ok) {
-    const err = await response.text();
-    throw new Error(`Gemini API error: ${response.status} — ${err}`);
+  if (!response || !response.ok) {
+    const err = response ? await response.text() : "No response";
+    throw new Error(`Gemini API error — ${err}`);
   }
 
   const data = await response.json();
