@@ -78,11 +78,12 @@
 
 /* ── LIGHT TOKENS ── */
 .light {
-  --bg:          #f0f4fc;   /* soft blue-grey */
-  --bg-card:     rgba(255,255,255,0.85);
-  --bg-glass:    rgba(255,255,255,0.70);
-  --border-base: rgba(15,23,42,0.10);
-  --border-soft: rgba(15,23,42,0.07);
+  /* Rich layered background — essential for glass to show depth */
+  --bg:          #dde8f8;   /* blue-tinted light */
+  --bg-card:     rgba(255,255,255,0.45);
+  --bg-glass:    rgba(255,255,255,0.30);
+  --border-base: rgba(29,78,216,0.14);
+  --border-soft: rgba(29,78,216,0.08);
 
   --text-primary:   #0f172a;
   --text-secondary: rgba(15,23,42,0.60);
@@ -161,6 +162,19 @@
   html { scroll-behavior: smooth; }
 }
 
+/* Light mode: rich gradient background so glass has something to blur over */
+.light body,
+.light [class*="bg-\[#08101c\]"] {
+  background:
+    radial-gradient(ellipse 90% 50% at 10% 10%,  rgba(99,102,241,0.18) 0%, transparent 60%),
+    radial-gradient(ellipse 70% 40% at 90% 20%,  rgba(59,130,246,0.16) 0%, transparent 55%),
+    radial-gradient(ellipse 60% 40% at 60% 80%,  rgba(13,148,136,0.14) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 50% at 20% 70%,  rgba(139,92,246,0.10) 0%, transparent 50%),
+    linear-gradient(160deg, #dde8f8 0%, #e8f0fb 40%, #d6e8f5 70%, #dde4f7 100%);
+  background-attachment: fixed;
+}
+
+
 /* ─── Scrollbar ─────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: var(--scrollbar-track); }
@@ -210,12 +224,40 @@
   border: 1px solid var(--blue-bd);
 }
 
-/* Light-mode overrides for glass cards — give them crisp white surfaces */
-.light .glass-card {
-  box-shadow: 0 1px 4px rgba(15,23,42,0.06), 0 4px 16px rgba(15,23,42,0.06);
-}
+/* Light-mode glassmorphism — translucent, blurred, tinted */
 .light .glass {
-  box-shadow: 0 1px 3px rgba(15,23,42,0.06);
+  background: rgba(255,255,255,0.30);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(29,78,216,0.14);
+  box-shadow: 0 2px 12px rgba(29,78,216,0.08), inset 0 1px 0 rgba(255,255,255,0.7);
+}
+
+.light .glass-card {
+  background: rgba(255,255,255,0.40);
+  backdrop-filter: blur(28px) saturate(200%);
+  -webkit-backdrop-filter: blur(28px) saturate(200%);
+  border: 1px solid rgba(29,78,216,0.16);
+  box-shadow:
+    0 4px 24px rgba(29,78,216,0.10),
+    0 1px 0 rgba(255,255,255,0.85) inset,
+    0 -1px 0 rgba(29,78,216,0.06) inset;
+}
+
+.light .glass-card:hover {
+  background: rgba(255,255,255,0.55);
+  border-color: rgba(29,78,216,0.22);
+  box-shadow:
+    0 8px 32px rgba(29,78,216,0.14),
+    0 1px 0 rgba(255,255,255,0.9) inset;
+}
+
+.light .glass-strong {
+  background: rgba(29,78,216,0.08);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(29,78,216,0.22);
+  box-shadow: 0 2px 16px rgba(29,78,216,0.12), inset 0 1px 0 rgba(255,255,255,0.6);
 }
 
 /* ─── Glows ─────────────────────────────────────────────── */
@@ -439,14 +481,49 @@ select option:checked    { background-color: var(--select-hover-bg); color: #fff
 .light .border-white\/8  { border-color: rgba(15,23,42,0.09) !important; }
 .light .border-white\/10 { border-color: rgba(15,23,42,0.10) !important; }
 
-/* Nav glass in light */
+/* Nav glass in light — frosted glass with blue tint */
 .light nav.glass {
-  background: rgba(240,244,252,0.88) !important;
-  border-bottom: 1px solid rgba(15,23,42,0.08) !important;
+  background: rgba(255,255,255,0.35) !important;
+  backdrop-filter: blur(24px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(200%) !important;
+  border-bottom: 1px solid rgba(29,78,216,0.12) !important;
+  box-shadow: 0 2px 20px rgba(29,78,216,0.08) !important;
 }
 
-/* Body override */
-.light body,
-.light [class*="bg-\[#08101c\]"] {
-  background-color: var(--bg) !important;
+/* Sticky headers glass in light */
+.light .glass.border-b {
+  background: rgba(255,255,255,0.35) !important;
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+  box-shadow: 0 2px 16px rgba(29,78,216,0.07) !important;
 }
+
+/* Inputs: frosted glass style in light mode */
+.light input,
+.light textarea {
+  background: rgba(255,255,255,0.55) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-color: rgba(29,78,216,0.18) !important;
+  color: var(--text-primary);
+}
+.light input:focus,
+.light textarea:focus {
+  background: rgba(255,255,255,0.72) !important;
+  border-color: rgba(29,78,216,0.38) !important;
+  box-shadow: 0 0 0 3px rgba(29,78,216,0.10);
+}
+.light input::placeholder,
+.light textarea::placeholder {
+  color: rgba(15,23,42,0.35);
+}
+
+/* Select: frosted in light */
+.light select {
+  background: rgba(255,255,255,0.50) !important;
+  backdrop-filter: blur(12px);
+  border-color: rgba(29,78,216,0.18) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Remove the old flat body override that fights the gradient */
