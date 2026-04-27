@@ -1,8 +1,9 @@
 import type { UserProfile, CareerAnalysis } from "@/types";
+import { jsonrepair } from "jsonrepair";
 import { generateId } from "./utils";
 
 const GEMINI_ENDPOINT =
-  "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
+  "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
 
 function getApiKey(): string {
   const key =
@@ -81,8 +82,8 @@ ${profile.resumeText ? `- **Resume Notes**: ${profile.resumeText.substring(0, 50
             "why": "string - why this matters for their specific goal"
           }
         ],
-        "milestones": ["array of 3-4 checkpoints"],
-        "weeklyGoals": ["array of weekly targets"],
+        "milestones": ["array of 2 checkpoints"],
+        "weeklyGoals": ["array of 2 weekly targets"],
         "resources": [
           {
             "title": "string",
@@ -110,12 +111,12 @@ ${profile.resumeText ? `- **Resume Notes**: ${profile.resumeText.substring(0, 50
       "difficulty": number (1-5),
       "buildTime": "string e.g. 2-3 weeks",
       "mvpScope": "string - exactly what the MVP is",
-      "coreFeatures": ["array of 5-7 specific features"],
-      "techStack": ["array of specific technologies"],
+      "coreFeatures": ["array of 3-4 specific features"],
+      "techStack": ["array of 3 specific technologies"],
       "monetizationPotential": "string",
       "resumeValue": "string - what it proves to employers",
       "portfolioImpact": "string - how it stands out",
-      "buildRoadmap": ["array of 5 build steps in order"],
+      "buildRoadmap": ["array of 3 build steps in order"],
       "targetAudience": "string",
       "marketSize": "string",
       "similarProducts": ["string - real products in this space"],
@@ -182,13 +183,14 @@ ${profile.resumeText ? `- **Resume Notes**: ${profile.resumeText.substring(0, 50
 }
 
 CRITICAL RULES:
-1. Generate exactly 4 roadmap phases
-2. Generate exactly 4 project ideas — all must be non-trivial, impressive, and career-relevant
-3. Include 3-5 ready skills and 4-7 gap skills in skillGap
-4. All numbers must be realistic and based on the actual profile
-5. Projects must NOT be: todo apps, calculators, weather apps, simple CRUD, or clone projects without unique angles
-6. Every recommendation must directly serve the user's stated goal: ${profile.goal}
-7. Be honest — if they are not ready, say so clearly`;
+1. Generate EXACTLY 2 roadmap phases to avoid max token limits.
+2. Generate EXACTLY 2 project ideas.
+3. Include exactly 2 ready skills and 2 gap skills in skillGap.
+4. Ensure NO ARRAY has more than 3 items to save space.
+5. Keep every string under 10 words. Be ruthlessly brief.
+6. CRITICAL: NEVER use unescaped double quotes inside your string values. Return strictly valid JSON.
+7. Projects must NOT be: todo apps, calculators, weather apps, simple CRUD, or clone projects without unique angles.
+8. Every recommendation must directly serve the user's stated goal: ${profile.goal}`;
 }
 
 export async function generateCareerAnalysis(
@@ -244,14 +246,20 @@ export async function generateCareerAnalysis(
   const rawText =
     data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
-  let parsed: Omit<CareerAnalysis, "generatedAt" | "userProfile">;
+  let parsed: any;
   try {
     parsed = JSON.parse(rawText);
-  } catch {
-    // Try to extract JSON from the text
-    const match = rawText.match(/\{[\s\S]*\}/);
+  } catch (e) {
+    // Try to extract JSON from the text and repair it
+    const match = rawText.match(/\{[\s\S]*/);
     if (match) {
-      parsed = JSON.parse(match[0]);
+      try {
+        const repaired = jsonrepair(match[0]);
+        parsed = JSON.parse(repaired);
+      } catch(e2) {
+        console.error("Repair failed", e2);
+        throw new Error("Failed to parse AI response. Please try again.");
+      }
     } else {
       throw new Error("Failed to parse AI response. Please try again.");
     }
@@ -259,11 +267,14 @@ export async function generateCareerAnalysis(
 
   onProgress?.(95, "Finalizing your intelligence report...");
 
-  // Inject IDs into projects
-  parsed.projects = parsed.projects.map((p) => ({
+  // Safe fallbacks for truncated properties
+  parsed.projects = (parsed.projects || []).map((p: any) => ({
     ...p,
     id: p.id || generateId(),
   }));
+  parsed.roadmap = parsed.roadmap || { phases: [] };
+  parsed.skillGap = parsed.skillGap || { readySkills: [], gapSkills: [] };
+  parsed.hiring = parsed.hiring || { portfolioSignals: [], resumeGaps: [], quickWins: [], longTermMoves: [], jobTitlesToTarget: [], companiesThatWouldHire: [] };
 
   const analysis: CareerAnalysis = {
     ...parsed,
